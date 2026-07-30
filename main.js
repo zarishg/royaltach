@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initServices();
   initOrbit();
   initProjectGlows();
+  initCeoTabs();
   initScrollReveal();
+  initTypewriter();
   initContactForm();
   
   // Set current footer year
@@ -35,6 +37,28 @@ function initCursor() {
     
     if (!isMoving) {
       isMoving = true;
+      rx = mx;
+      ry = my;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    }
+  });
+
+  // Hide cursor when leaving viewport
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity = '0';
+    ring.style.opacity = '0';
+  });
+
+  // Re-show and snap cursor when entering viewport
+  document.addEventListener('mouseenter', (e) => {
+    mx = e.clientX;
+    my = e.clientY;
+    rx = mx;
+    ry = my;
+    dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+    
+    if (isMoving) {
       dot.style.opacity = '1';
       ring.style.opacity = '1';
     }
@@ -263,6 +287,53 @@ function initScrollReveal() {
   revealElements.forEach(el => observer.observe(el));
 }
 
+// ---------- Typewriter Effect ----------
+function initTypewriter() {
+  const heroSub = document.querySelector('.hero-sub');
+  if (!heroSub) return;
+  
+  const text = heroSub.textContent.trim();
+  heroSub.textContent = '';
+  
+  // Create cursor element
+  const cursor = document.createElement('span');
+  cursor.className = 'typewriter-cursor';
+  heroSub.appendChild(cursor);
+  
+  let i = 0;
+  
+  function type() {
+    if (i < text.length) {
+      cursor.insertAdjacentText('beforebegin', text.charAt(i));
+      i++;
+      // Natural typewriter speed variance (15ms - 35ms)
+      const speed = Math.random() * 20 + 15;
+      setTimeout(type, speed);
+    } else {
+      // Fade cursor out and then remove it
+      setTimeout(() => {
+        cursor.style.opacity = '0';
+        setTimeout(() => cursor.remove(), 500);
+      }, 1500);
+    }
+  }
+  
+  // Start typing when the element gets revealed on screen
+  if (heroSub.classList.contains('in')) {
+    setTimeout(type, 300);
+  } else {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class' && heroSub.classList.contains('in')) {
+          setTimeout(type, 300);
+          observer.disconnect();
+        }
+      });
+    });
+    observer.observe(heroSub, { attributes: true });
+  }
+}
+
 // ---------- Interactive Glassmorphic Contact Form ----------
 function initContactForm() {
   const form = document.getElementById('contactForm');
@@ -293,3 +364,34 @@ function initContactForm() {
     }, 1800);
   });
 }
+
+// ---------- CEO Spotlight Tabs ----------
+function initCeoTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+  
+  if (tabBtns.length === 0) return;
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+      
+      // Deactivate all buttons
+      tabBtns.forEach(b => b.classList.remove('active'));
+      // Hide all panes
+      tabPanes.forEach(p => p.classList.remove('active'));
+      
+      // Activate clicked button
+      btn.classList.add('active');
+      // Show corresponding pane
+      const activePane = document.getElementById(`pane-${targetTab}`);
+      if (activePane) {
+        activePane.classList.add('active');
+      }
+      
+      // Notify custom cursor that new hover targets might have appeared
+      window.dispatchEvent(new Event('cursorRefresh'));
+    });
+  });
+}
+
