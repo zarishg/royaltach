@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://myagencysite.vercel.app/sitemap.xml
