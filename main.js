@@ -340,28 +340,56 @@ function initContactForm() {
   const feedback = document.getElementById('formFeedback');
   if (!form || !feedback) return;
 
-  form.addEventListener('submit', (e) => {
+  const CONTACT_EMAIL = 'royaltachofficial@gmail.com';
+  const ENDPOINT = 'https://formsubmit.co/ajax/' + CONTACT_EMAIL;
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    // Setup simple mock submission
-    feedback.className = 'form-feedback';
-    feedback.textContent = 'Transmitting brief to the kingdom...';
-    
     const submitBtn = form.querySelector('.cta-btn');
     const originalText = submitBtn.innerHTML;
+    const val = (id) => (document.getElementById(id)?.value || '').trim();
+    const typeSelect = document.getElementById('projectType');
+    const typeLabel = typeSelect && typeSelect.selectedIndex >= 0 ? typeSelect.options[typeSelect.selectedIndex].text : '';
+
+    // Hidden honeypot field: real visitors never fill it, bots usually do.
+    if (form.querySelector('[name="_honey"]')?.value) return;
+
+    feedback.className = 'form-feedback';
+    feedback.textContent = 'Sending your message...';
     submitBtn.disabled = true;
     submitBtn.style.opacity = '0.6';
 
-    setTimeout(() => {
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name: val('name'),
+          email: val('email'),
+          project_type: typeLabel,
+          message: val('message'),
+          _subject: 'New project enquiry from Royaltach website — ' + val('name'),
+          _replyto: val('email'),
+          _template: 'table',
+          _captcha: 'false'
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === 'false' || data.success === false) {
+        throw new Error(data.message || 'Request failed');
+      }
       feedback.classList.add('success');
-      feedback.textContent = 'Message sent! Our architect will contact you shortly.';
-      
+      feedback.textContent = 'Message sent! Our team will contact you shortly.';
+      form.reset();
+    } catch (err) {
+      console.error('Contact form error:', err);
+      feedback.className = 'form-feedback error';
+      feedback.innerHTML = 'Sorry, your message could not be sent. Please email us directly at <a href="mailto:' + CONTACT_EMAIL + '">' + CONTACT_EMAIL + '</a>.';
+    } finally {
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
       submitBtn.innerHTML = originalText;
-      
-      form.reset();
-    }, 1800);
+    }
   });
 }
 
