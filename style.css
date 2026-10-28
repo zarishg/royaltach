@@ -1432,3 +1432,7 @@ a.ceo-contact-item:hover {
 .form-feedback.error { color: #ff7a7a; }
 .form-feedback.error a { color: inherit; text-decoration: underline; }
 .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+/* Product cards: live link */
+.project-link { display: inline-block; margin-top: 16px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold, #e6c27a); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+.project-link:hover { opacity: .8; }
