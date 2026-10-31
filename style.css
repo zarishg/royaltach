@@ -1460,3 +1460,12 @@ footer .footer-brand a { display: inline-block; margin-top: 10px; font-family: v
 .faq-item p { margin: 0 0 20px; line-height: 1.7; opacity: .8; max-width: 70ch; }
 .wa-float { position: fixed; right: 22px; bottom: 22px; width: 56px; height: 56px; border-radius: 50%; background: #25d366; color: #fff; display: grid; place-items: center; z-index: 90; box-shadow: 0 8px 24px rgba(0,0,0,.45); transition: transform .25s; }
 .wa-float:hover { transform: scale(1.08); }
+
+/* Preview only: retain typing effect without moving following content. */
+.hero-sub { position: relative; }
+.hero-sub .typewriter-measure { display: block; visibility: hidden; }
+.hero-sub .typewriter-live { position: absolute; top: 0; left: 0; width: 100%; }
+/* Preserve heading fade, start it directly in CSS rather than awaiting JS. */
+.hero-content h1.reveal { opacity: 1; transform: none; animation: hero-heading-entrance 900ms cubic-bezier(.2,.8,.2,1) both; }
+@keyframes hero-heading-entrance { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .hero-content h1.reveal { animation: none; } }
