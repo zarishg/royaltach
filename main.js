@@ -293,12 +293,20 @@ function initTypewriter() {
   if (!heroSub) return;
   
   const text = heroSub.textContent.trim();
+  // Reserve the full paragraph dimensions while typing the visible copy.
   heroSub.textContent = '';
-  
-  // Create cursor element
+  const measure = document.createElement('span');
+  measure.className = 'typewriter-measure';
+  measure.textContent = text;
+  heroSub.appendChild(measure);
+
+  const live = document.createElement('span');
+  live.className = 'typewriter-live';
+  heroSub.appendChild(live);
+
   const cursor = document.createElement('span');
   cursor.className = 'typewriter-cursor';
-  heroSub.appendChild(cursor);
+  live.appendChild(cursor);
   
   let i = 0;
   
